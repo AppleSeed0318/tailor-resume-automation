@@ -1,0 +1,161 @@
+/* Resume Tailor AI - Professional resume styling */
+/* Font: Arial or Helvetica; Headings: MidnightBlue; Clean layout */
+
+@charset "UTF-8";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11pt;
+  line-height: 1.4;
+  color: #222;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px 32px 32px;
+  background: #fff;
+}
+
+/* Header: Name and contact - large, bold, centered */
+.resume-header {
+  text-align: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid MidnightBlue;
+}
+
+.resume-header .name {
+  font-size: 22pt;
+  font-weight: bold;
+  color: #111;
+  margin: 0 0 8px 0;
+  letter-spacing: 0.02em;
+}
+
+.resume-header .role-line {
+  font-size: 11pt;
+  font-weight: 600;
+  color: MidnightBlue;
+  margin: 0 0 6px 0;
+}
+
+.resume-header .contact {
+  font-size: 10pt;
+  color: #444;
+  margin: 0;
+}
+
+.resume-header .contact span + span::before {
+  content: " • ";
+  margin: 0 6px;
+}
+
+/* Section titles - MidnightBlue */
+h2.section-title {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12pt;
+  font-weight: bold;
+  color: MidnightBlue;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 18px 0 10px 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Summary paragraph */
+.resume-summary {
+  margin: 8px 0 4px 0;
+  padding: 0;
+  text-align: justify;
+}
+
+/* Experience / Education blocks */
+.resume-block {
+  margin-bottom: 14px;
+}
+
+.resume-block .block-title {
+  font-weight: bold;
+  font-size: 11pt;
+  color: #222;
+  margin: 0 0 2px 0;
+}
+
+.resume-block .block-subtitle {
+  font-size: 10pt;
+  color: #555;
+  margin: 0 0 6px 0;
+}
+
+.resume-block ul {
+  margin: 0 0 0 18px;
+  padding: 0;
+}
+
+.resume-block li {
+  margin-bottom: 4px;
+}
+
+/* Skills: comma-separated or list */
+.skills-list {
+  margin: 6px 0 0 0;
+  padding: 0;
+  list-style: none;
+  margin-left: 0;
+}
+
+.skills-list li {
+  display: inline;
+}
+
+.skills-list li::after {
+  content: ", ";
+}
+
+.skills-list li:last-child::after {
+  content: "";
+}
+
+/* Core Technical Skills - categorized */
+.skills-category {
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.skills-category-name {
+  font-weight: bold;
+  color: #222;
+}
+
+/* Projects and achievements */
+.resume-list {
+  margin: 6px 0 0 18px;
+  padding: 0;
+}
+
+.resume-list li {
+  margin-bottom: 4px;
+}
+
+/* Print-friendly */
+@media print {
+  body {
+    padding: 16px 24px;
+  }
+
+  .resume-header {
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+  }
+
+  h2.section-title {
+    margin-top: 12px;
+  }
+
+  .resume-block {
+    margin-bottom: 10px;
+  }
+}
