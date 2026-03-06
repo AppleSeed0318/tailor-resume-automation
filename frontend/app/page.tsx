@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Link from "next/link";
 import { THEMES, getThemedResumeHtml } from "@/lib/resume-themes";
+import { getResumePdfFilename, parseResumeNameAndRole } from "@/lib/resume-utils";
+import { type SavedItem, getSavedItems, setSavedItems } from "@/lib/resume-storage";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -9,6 +12,7 @@ type Status = "idle" | "loading" | "success" | "error";
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
+  const [companyName, setCompanyName] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +40,7 @@ export default function Home() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "resume_tailored.pdf";
+      a.download = getResumePdfFilename(themedHtml);
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
@@ -79,6 +83,17 @@ export default function Home() {
       setResumeHtml(html);
       setSelectedThemeId(null);
       setStatus("success");
+
+      const { role } = parseResumeNameAndRole(html);
+      const newItem: SavedItem = {
+        id: String(Date.now()),
+        companyName: companyName.trim() || "—",
+        jobDescription: jobDescription.trim(),
+        resumeHtml: html,
+        roleLine: role,
+        createdAt: new Date().toISOString(),
+      };
+      setSavedItems([newItem, ...getSavedItems()]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
       setStatus("error");
@@ -113,6 +128,10 @@ export default function Home() {
 
   return (
     <main className="page">
+      <nav className="nav">
+        <Link href="/" className="active">Resume Tailor AI</Link>
+        <Link href="/history">History</Link>
+      </nav>
       <div className="container">
         <header className="header">
           <h1>Resume Tailor AI</h1>
@@ -131,6 +150,17 @@ export default function Home() {
             accept=".pdf"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             className="fileInput"
+          />
+
+          <label className="label">
+            Company name (optional)
+          </label>
+          <input
+            type="text"
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+            placeholder="e.g. Acme Inc."
+            className="textInput"
           />
 
           <label className="label">
@@ -204,6 +234,23 @@ export default function Home() {
           padding: 2rem 1rem;
           min-height: 100vh;
         }
+        .nav {
+          max-width: 720px;
+          margin: 0 auto 1.5rem;
+          display: flex;
+          gap: 1rem;
+        }
+        .nav a {
+          color: var(--color-midnight);
+          font-weight: 600;
+          text-decoration: none;
+        }
+        .nav a:hover {
+          text-decoration: underline;
+        }
+        .nav a.active {
+          text-decoration: underline;
+        }
         .container {
           max-width: 720px;
           margin: 0 auto;
@@ -240,6 +287,18 @@ export default function Home() {
           margin-top: 0.25rem;
           display: block;
           font-size: 0.95rem;
+        }
+        .textInput {
+          width: 100%;
+          margin-top: 0.25rem;
+          padding: 0.65rem 0.75rem;
+          font-size: 0.95rem;
+          border: 1px solid #ccc;
+          border-radius: 6px;
+        }
+        .textInput:focus {
+          outline: none;
+          border-color: var(--color-midnight);
         }
         .textarea {
           width: 100%;

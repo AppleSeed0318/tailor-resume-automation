@@ -13,38 +13,28 @@ try:
 except ImportError:
     OpenAI = None
 
-RESUME_EXTRACT_SYSTEM = """You are an expert resume parser. Extract structured information from resume text.
-Output valid JSON only. Preserve exact company names, job titles, and date ranges (do not modify or infer).
-For education, preserve exact institution names and date ranges."""
+RESUME_EXTRACT_SYSTEM = """You are a resume parser. Output valid JSON only. Preserve exact company names, job titles, date ranges, and institution names."""
 
-RESUME_EXTRACT_USER = """Extract the following from this resume text. Return JSON with these keys (use empty arrays/strings if not found):
-- name: string (full name)
-- email: string
-- mobile: string (phone number)
-- location: string (city, state/country, or full address if present)
-- summary: string (professional summary or objective, if any)
-- education: array of {{ degree, institution, duration, score_or_grade }} (preserve exact institution name and duration)
-- skills: array of strings (technical and soft skills)
-- experience: array of {{ company, role, period, bullets }} where bullets is array of strings (preserve exact company, role, period)
-- projects: array of {{ name, description, technologies_or_outcome }} 
-- achievements: array of strings
-- other_activities: array of strings (hobbies, volunteer, etc.)
+RESUME_EXTRACT_USER = """Extract from the resume below. Return JSON with these keys (empty string or [] if missing):
+name, email, mobile, location, summary (strings)
+education: [{{degree, institution, duration, score_or_grade}}]
+skills: [string]
+experience: [{{company, role, period, bullets}}]
+projects: [{{name, description, technologies_or_outcome}}]
+achievements: [string], other_activities: [string]
+Preserve exact companies, periods, institutions.
 
-Resume text:
+Resume:
 ---
 {resume_text}
 ---"""
 
-JD_EXTRACT_SYSTEM = """You are an expert job description analyzer. Extract key requirements and keywords for resume matching.
-Output valid JSON only."""
+JD_EXTRACT_SYSTEM = """Extract job requirements as JSON. Output valid JSON only."""
 
-JD_EXTRACT_USER = """From this job description, extract:
-- job_title: string
-- skills: array of strings (technical skills, tools, frameworks mentioned)
-- qualifications: array of strings (degree level, certifications, experience years)
-- responsibilities: array of strings (key responsibilities)
-- keywords: array of strings (important terms for ATS and matching)
-- bonus_points: array of strings (items from "Bonus Points", "Nice to Have", "Preferred", or similar sections - e.g. "Familiar with Pixel Crushers' Dialogue System for Unity", "Familiar with XML processing using DOM, SAX, XSD", "Located in Seattle, Los Angeles, or Edmonton". Keep each as a short phrase or sentence.)
+JD_EXTRACT_USER = """From the job description extract JSON:
+job_title, skills: [string], qualifications: [string], responsibilities: [string], keywords: [string]
+bonus_points: [string] (from "Bonus Points", "Nice to Have", "Preferred" - short phrases)
+Preserve exact wording where it matters.
 
 Job description:
 ---

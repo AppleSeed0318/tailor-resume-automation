@@ -15,38 +15,19 @@ try:
 except ImportError:
     OpenAI = None
 
-TAILOR_SYSTEM = """You are an expert resume builder. Your task is to tailor a candidate's resume to a specific job description to maximize match score.
+TAILOR_SYSTEM = """You tailor resumes to job descriptions. Output valid JSON only.
 
-STRICT RULES (must follow):
-1. Do NOT remove or change any employment entry: keep every COMPANY NAME and PERIOD exactly as given. You MAY change the job role/title for each entry to align with the JD (e.g. "Frontend Developer" → "Senior Frontend Developer" for this application).
-2. Do NOT remove, rename, or change any education entry: keep every institution name and period exactly as given.
-3. For each experience entry: write 4-10 bullet points tailored to the JD; rewrite work history to match the target role. Use measurable results where possible (e.g., "improved X by Y%").
-4. Keep the same number of experience entries and education entries.
-5. The professional summary MUST present the candidate as a fit for the EXACT job title from the job description. Do NOT include employment type in the summary (e.g. no "Part-Time", "Full-Time", "Contract" in the summary text).
-6. The professional summary MUST always state "10 years of experience" (or "10+ years" / "over 10 years of experience") so the candidate is presented as having a decade of experience.
-7. The professional summary MUST highlight the top 3-5 skills that the JD requires: explicitly mention those key skills (from the job requirements) in the summary so they stand out to recruiters.
-8. For skills_by_category: you MUST preserve nearly ALL (at least 90%) of the candidate's skills from their base resume. Include every category and skill from the candidate's profile; only add a few JD skills if they fit. Do not remove or drop the candidate's original skills.
-9. Output valid JSON only."""
+Rules: Keep every company name and period unchanged. Keep every education institution and duration unchanged. You may change job role/title per entry to match JD. 4-10 bullets per job, tailored to JD. Summary: match job title; do not mention employment type (Part-Time/Full-Time/Contract); must state "10 years of experience" (or "10+ years"); highlight top 3-5 JD skills. skills_by_category: keep ~90%+ of candidate skills; preserve all categories; add 1-2 JD skills per category if relevant. Same number of experience and education entries."""
 
-TAILOR_USER = """Given the candidate profile and the job requirements, produce a tailored resume content as JSON.
+TAILOR_USER = """Tailor the candidate profile to the job. Return one JSON object.
 
-Candidate profile (extracted from resume):
+Candidate:
 {profile_json}
 
-Job requirements (extracted from job description):
+Job:
 {jd_json}
 
-Return a single JSON object with these keys (all required):
-- summary: string (tailored professional summary for THIS job title. ALWAYS include "10 years of experience" or "10+ years of experience". Explicitly highlight the top 3-5 skills the JD requires (e.g. "Expert in React, Node.js, and AWS"). Do NOT mention Part-Time, Full-Time, or Contract.)
-- skills: array of strings (merge candidate skills with relevant JD skills; list most relevant first)
-- skills_by_category: object mapping category names to arrays of skills. YOU MUST INCLUDE at least 90% of the candidate's base resume skills. Preserve all categories and skills from the candidate's profile (e.g. Programming Languages, Machine Learning, Frameworks and Libraries, Data Engineering, Backend, Cloud, MLOps, Databases, Tools, Methodologies). Add only 1-2 JD skills per category if relevant. Do not remove the candidate's skills.
-- experience: array of objects, one per job. Each has: company (unchanged from profile), role (you MAY change to align with JD, e.g. "Senior Frontend Developer"), period (unchanged), bullets (array of 4-10 strings, tailored to JD; rewrite work history to match target role)
-- education: array of objects with: degree, institution, duration, score_or_grade (institution and duration unchanged). INCLUDE ALL education entries from the profile.
-- projects: array of objects with name, description (tailored if relevant)
-- achievements: array of strings (prioritize and reword to match JD)
-- other_activities: array of strings (keep or shorten)
-
-Remember: company names and periods must NOT be modified. Role per job can be updated to match JD. Write 4-10 bullets per job. Summary must match job title, always state 10 years of experience, and highlight top JD skills."""
+Keys: summary (string; include "10 years of experience", highlight top 3-5 JD skills, no Part-Time/Full-Time/Contract), skills ([string]), skills_by_category (object: category -> [skills]; keep ~90% candidate skills), experience ([{{company, role, period, bullets}}]; company/period unchanged, 4-10 bullets), education ([{{degree, institution, duration, score_or_grade}}]; all entries, institution/duration unchanged), projects ([{{name, description}}]), achievements ([string]), other_activities ([string])."""
 
 
 def _client() -> "OpenAI":
@@ -76,8 +57,8 @@ def tailor_resume(profile: dict[str, Any], jd_extract: dict[str, Any]) -> dict[s
             {
                 "role": "user",
                 "content": TAILOR_USER.format(
-                    profile_json=json.dumps(profile, indent=2),
-                    jd_json=json.dumps(jd_extract, indent=2),
+                    profile_json=json.dumps(profile),
+                    jd_json=json.dumps(jd_extract),
                 ),
             },
         ],
