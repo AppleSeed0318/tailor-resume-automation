@@ -17,7 +17,7 @@ Output: **Markdown** and **styled HTML** (Arial/Helvetica, MidnightBlue headings
 ## Setup
 
 ```bash
-cd E:\Hobby\TailorAI\cursor
+cd E:\Ninja\TailorAI
 python -m venv .venv
 .venv\Scripts\activate   # Windows
 pip install -r requirements.txt
